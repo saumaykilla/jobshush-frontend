@@ -19,8 +19,8 @@ export const auth = defineAuth({
         }
 
       },
-      callbackUrls:["http://localhost:3000/auth/callback"],
-      logoutUrls:["http://localhost:3000/auth"],
+      callbackUrls:["http://localhost:3000/auth/callback","https://excelifyai.com/auth/callback"],
+      logoutUrls:["http://localhost:3000/auth","https://excelifyai.com/auth"],
     }
 
   },
