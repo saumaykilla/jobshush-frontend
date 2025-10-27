@@ -53,7 +53,6 @@ export async function POST(request: NextRequest) {
       }
     );
     const resume: ProfileType = await request.data.resume;
-    console.log(resume);
     const profile: Partial<ProfileType> = {
       personalDetails: {
         fullName: resume?.personalDetails?.fullName,

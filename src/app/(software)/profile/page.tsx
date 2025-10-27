@@ -203,7 +203,6 @@ const Profile = () => {
       });
     };
     if (!profile) {
-      console.log("fetching profile");
       fetchProfile();
     }
     methods.reset(profile);

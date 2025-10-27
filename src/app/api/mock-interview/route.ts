@@ -10,14 +10,14 @@ type CreateMockInterviewRequest = {
 
 const roomService = new RoomServiceClient(
   process.env.NEXT_PUBLIC_LIVEKIT_URL!,
-  process.env.LIVEKIT_API_KEY!,
-  process.env.LIVEKIT_API_SECRET!
+  process.env.NEXT_PUBLIC_LIVEKIT_API_KEY!,
+  process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET!
 );
 
 const agentDispatchClient = new AgentDispatchClient(
   process.env.NEXT_PUBLIC_LIVEKIT_URL!,
-  process.env.LIVEKIT_API_KEY!,
-  process.env.LIVEKIT_API_SECRET!
+  process.env.NEXT_PUBLIC_LIVEKIT_API_KEY!,
+  process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET!
 );
 
 export async function POST(req: NextRequest) {
@@ -32,8 +32,8 @@ export async function POST(req: NextRequest) {
 
     if (
       !process.env.NEXT_PUBLIC_LIVEKIT_URL ||
-      !process.env.LIVEKIT_API_KEY ||
-      !process.env.LIVEKIT_API_SECRET
+      !process.env.NEXT_PUBLIC_LIVEKIT_API_KEY ||
+      !process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET
     )
       return NextResponse.json(
         { error: "Missing required environment variables" },
@@ -63,8 +63,8 @@ export async function POST(req: NextRequest) {
       rooms[0]?.metadata?.substring(0, 100)
     );
     const token = new AccessToken(
-      process.env.LIVEKIT_API_KEY!,
-      process.env.LIVEKIT_API_SECRET!,
+      process.env.NEXT_PUBLIC_LIVEKIT_API_KEY!,
+      process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET!,
       {
         identity: candidate.replace(/\s+/g, "_"),
         name: candidate,

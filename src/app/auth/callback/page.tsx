@@ -24,7 +24,6 @@ export default function AuthCallback() {
       // Fetch user attributes
       const attributes = await fetchUserAttributes();
       
-      console.log('User attributes:', attributes);
 
       // Check if isOnboarded attribute exists
       if (!attributes['custom:isOnboarded']) {

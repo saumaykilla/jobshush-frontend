@@ -206,7 +206,6 @@ const Onboarding = () => {
         body: formData,
       });
       const data = await response.json();
-      console.log(data);
       methods?.reset(data);
     } catch (error) {
       console.error(error);
@@ -617,7 +616,6 @@ const Onboarding = () => {
         isValid = true;
       }
     }
-    console.log(methods?.watch());
     if (currentStep < steps.length - 1 && isValid) {
       setCurrentStep(currentStep + 1);
     }

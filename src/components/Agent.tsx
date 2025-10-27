@@ -81,8 +81,6 @@ export default function Page({
     };
   }, [roomInstance, roomName, token, router, hasDeletedRef]);
 
-  console.log(roomInstance?.remoteParticipants);
-  console.log(roomInstance?.localParticipant);
   return isLoading || !roomInstance?.remoteParticipants ? (
     <div className="absolute  top-0 left-0 z-100 h-full w-full flex items-center justify-center">
       <Loading message="Connecting to your interview session, please wait..." />
