@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { fetchUserAttributes, updateUserAttributes } from 'aws-amplify/auth';
+import { fetchAuthSession, fetchUserAttributes, updateUserAttributes } from 'aws-amplify/auth';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useProfileStore } from '@/store/profileStore';
@@ -21,6 +21,8 @@ export default function AuthCallback() {
 
       await new Promise(resolve => setTimeout(resolve, 1000));
 
+      await fetchAuthSession({forceRefresh: true})
+      
       // Fetch user attributes
       const attributes = await fetchUserAttributes();
       
