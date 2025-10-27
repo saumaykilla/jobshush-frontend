@@ -13,6 +13,7 @@ const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     ignores: [
+      ".amplify/**",
       "node_modules/**",
       ".next/**",
       "out/**",
@@ -20,6 +21,8 @@ const eslintConfig = [
       "next-env.d.ts",
     ],
   },
+ 
+
 ];
 
 export default eslintConfig;
