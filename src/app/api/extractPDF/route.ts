@@ -5,7 +5,7 @@ import outputs from "../../../../amplify_outputs.json";
 import { ProfileType } from "@/lib/schemas/ProfileSchema";
 import { authenticatedUser } from "../../../lib/amplifyServerUtils";
 
-export async function POST(request: NextRequest, response: NextResponse) {
+export async function POST(request: NextRequest) {
  
   const formData = await request.formData();
 
@@ -20,6 +20,7 @@ export async function POST(request: NextRequest, response: NextResponse) {
         status: 500,
       }
     );
+  const response = NextResponse.next();
   const session = await authenticatedUser({ request, response });
   if (!session)
     return NextResponse.json(

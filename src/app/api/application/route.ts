@@ -4,7 +4,7 @@ import axios from "axios";
 import outputs from "../../../../amplify_outputs.json";
 import { Schema } from "../../../../amplify/data/resource";
 
-export async function POST(request: NextRequest, response: NextResponse) {
+export async function POST(request: NextRequest) {
   const { resume, jobDescription } = await request.json();
 
   if (!resume || !jobDescription)
@@ -16,6 +16,7 @@ export async function POST(request: NextRequest, response: NextResponse) {
         status: 500,
       }
     );
+    const response = NextResponse.next();
   const session = await authenticatedUser({ request, response });
   if (!session)
     return NextResponse.json(

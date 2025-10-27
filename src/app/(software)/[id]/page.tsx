@@ -7,9 +7,7 @@ import { AlertTriangle, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 interface ApplicationPageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>
 }
 
 type ApplicationResult = 
@@ -106,7 +104,7 @@ async function getApplicationById(id: string): Promise<ApplicationResult> {
 }
 
 export default async function ApplicationPage({ params }: ApplicationPageProps) {
-  const {id} = (await params);
+  const {id} = await params;
   const result = await getApplicationById(id);
 
   // If successful, render the TailoredResume component
