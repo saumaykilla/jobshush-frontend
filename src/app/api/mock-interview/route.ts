@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { RoomServiceClient, AccessToken, AgentDispatchClient } from "livekit-server-sdk";
 import { ProfileType } from "@/lib/schemas/ProfileSchema";
-
+import { authenticatedUser } from "@/lib/amplifyServerUtils";
+import outputs from "../../../../amplify_outputs.json";
 type CreateMockInterviewRequest = {
   candidate: string;
   job: string;
@@ -21,10 +22,23 @@ const agentDispatchClient = new AgentDispatchClient(
 );
 
 export async function POST(req: NextRequest) {
+  const response = NextResponse.next();
+
+  const session = await authenticatedUser({ request: req, response: response  });
+  if (!session)
+    return NextResponse.json(
+      { error: "Session is missing" },
+      { status: 401 }
+    );
   try {
     const { candidate, job, resume }: CreateMockInterviewRequest =
       await req.json();
-    if (!candidate || !job || !resume)
+    const accessToken = session?.tokens?.accessToken?.toString();
+    const userPoolId = outputs.auth.user_pool_id;
+    const appId = outputs.auth.user_pool_client_id;
+    const aws_region = outputs.auth.aws_region;
+
+    if (!candidate || !job || !resume || !accessToken || !userPoolId || !appId || !aws_region)
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -45,11 +59,11 @@ export async function POST(req: NextRequest) {
       candidate,
       resume,
       job,
-      created_at: new Date().toISOString(),
+      accessToken,
+      userPoolId,
+      appId,
+      aws_region,
     });
-    const size = new TextEncoder().encode(JSON.stringify(metadata)).length;
-    const kiloBytes = size / 1024;
-    console.log(`Metadata size: ${kiloBytes} KB`);
     await roomService.createRoom({
       name: roomName,
       maxParticipants: 2,
