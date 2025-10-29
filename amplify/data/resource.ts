@@ -2,6 +2,12 @@ import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
 
 
 const schema = a.schema({
+
+  FeedbackPolling : a.model({
+    jobId:a.string().required(),
+    data:a.json(),
+    status:a.string(),
+  }).authorization((allow) => [allow.publicApiKey()]),
   PersonalDetails: a.customType({
     fullName: a.string().required(),
     email: a.email().required(),
@@ -86,6 +92,7 @@ const schema = a.schema({
   }).authorization((allow) => [allow.owner()]),
 
   MockInterviewFeedback: a.model({
+    userId: a.string().required(),
     recording:a.string(),
     companyName:a.string().required(),
     status:a.enum(['pending','completed','failed']),
@@ -124,6 +131,10 @@ export const data =
       {
         defaultAuthorizationMode:
           "userPool",
+          apiKeyAuthorizationMode:{
+            description:"API Key Authorization",
+            expiresInDays:365
+          }
       },
     }
   );
