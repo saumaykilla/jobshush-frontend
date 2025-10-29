@@ -85,6 +85,20 @@ const schema = a.schema({
     resetTime: a.datetime().required(),
   }).authorization((allow) => [allow.owner()]),
 
+  MockInterviewFeedback: a.model({
+    recording:a.string(),
+    companyName:a.string().required(),
+    status:a.enum(['pending','completed','failed']),
+    feedback : a.customType({
+      imporvement:a.string().array(),
+      strengths:a.string().array(),
+      starAnalysis:a.string().array(),
+      overallScore:a.integer(),
+      confidenceScore:a.integer(),
+      duration:a.integer(),
+    })
+  }).authorization((allow) => [allow.owner()]),
+
   Application: a.model({
     status:a.enum(['Applied','Interview','Rejected']),
     jobDescription: a.string().required(),
@@ -95,6 +109,7 @@ const schema = a.schema({
     coverLetter: a.string().required(),
   }).authorization((allow) => [allow.owner()]),
 });
+
 
 export type Schema =
   ClientSchema<
