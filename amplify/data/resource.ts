@@ -4,7 +4,6 @@ import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
 const schema = a.schema({
 
   FeedbackPolling : a.model({
-    jobId:a.string().required(),
     data:a.json(),
     status:a.string(),
   }).authorization((allow) => [allow.publicApiKey()]),

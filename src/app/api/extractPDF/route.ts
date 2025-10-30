@@ -1,58 +1,96 @@
 import { NextRequest, NextResponse } from "next/server";
 import { nanoid } from "nanoid";
-import axios from "axios";
-import outputs from "../../../../amplify_outputs.json";
 import { ProfileType } from "@/lib/schemas/ProfileSchema";
-import { authenticatedUser } from "../../../lib/amplifyServerUtils";
+import { cookieBasedClient } from "../../../lib/amplifyServerUtils";
 
-export async function POST(request: NextRequest) {
- 
-  const formData = await request.formData();
+export async function GET(request: NextRequest) {
+  const id = request.nextUrl.searchParams.get("id");
 
-  const file = formData.get("file") as File;
-
-  if (!file)
+  if (!id)
     return NextResponse.json(
       {
-        message: "incorrect File Uploaded",
+        message: "incorrect id",
       },
       {
         status: 500,
       }
     );
-  const response = NextResponse.next();
-  const session = await authenticatedUser({ request, response });
-  if (!session)
-    return NextResponse.json(
-      {
-        message: "Session is missing ",
-      },
-      {
-        status: 500,
-      }
-    );
-  const accessToken = session?.tokens?.accessToken?.toString();
-  const userPoolId = outputs.auth.user_pool_id;
-  const appId = outputs.auth.user_pool_client_id;
-  const aws_region = outputs.auth.aws_region;
 
-  const backendForm = new FormData();
-  backendForm.append("file", file);
   try {
-    const request = await axios.post(
-      `https://awggvl4c36.execute-api.us-east-2.amazonaws.com/extractFromFile`,
-      backendForm,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          userpool_id: userPoolId,
-          aws_region: aws_region,
-          client_id: appId,
-          "Content-Type": "multipart/form-data",
+    // Poll every 10 seconds with a maximum timeout
+    const maxAttempts = 24; // 2 minutes max (24 * 5 seconds)
+    let attempts = 0;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pollForCompletion = async (): Promise<any> => {
+      return new Promise((resolve, reject) => {
+        const intervalId = setInterval(async () => {
+          attempts++;
+
+          try {
+            const { data, errors } = await cookieBasedClient.models.FeedbackPolling.get(
+              {
+                id: id,
+              },
+              {
+                authMode: "apiKey",
+                authToken: 'da2-rtzretrwqrhcfd3fbhnm22mibe'
+              }
+            );
+
+            if (errors) {
+              clearInterval(intervalId);
+              reject(new Error("Error fetching polling data"));
+              return;
+            }
+
+            // Check if status has changed from pending
+            if (data?.status === "success") {
+              clearInterval(intervalId);
+              resolve(data.data);
+              return;
+            }
+
+            if (data?.status === "failed" || data?.status === "error") {
+              clearInterval(intervalId);
+              reject(new Error("PDF processing failed"));
+              return;
+            }
+
+            // Check max attempts
+            if (attempts >= maxAttempts) {
+              clearInterval(intervalId);
+              reject(new Error("Processing timeout - max attempts reached"));
+              return;
+            }
+
+            console.log(`Polling attempt ${attempts}/${maxAttempts}, status: ${data?.status}`);
+            
+          } catch (error) {
+            clearInterval(intervalId);
+            reject(error);
+          }
+        }, 5000); // Poll every 10 seconds
+      });
+    };
+
+    // Wait for polling to complete
+    const pollingResult = await pollForCompletion();
+
+    // Extract resume data from the polling result
+
+    console.log(JSON.parse(pollingResult));
+    const resume: ProfileType = JSON.parse(pollingResult);
+
+    if (!resume) {
+      return NextResponse.json(
+        {
+          error: "No resume data found in successful response",
         },
-      }
-    );
-    const resume: ProfileType = await request.data.resume;
+        { status: 500 }
+      );
+    }
+
     const profile: Partial<ProfileType> = {
       personalDetails: {
         fullName: resume?.personalDetails?.fullName,
@@ -100,6 +138,7 @@ export async function POST(request: NextRequest) {
         })),
       },
     };
+
     const sectionOrder: ProfileType["sectionOrder"] = [
       { id: nanoid(), type: "PersonalDetails", value: "Personal Details" },
       { id: nanoid(), type: "RoleDetails", value: "Role Details" },
@@ -131,7 +170,9 @@ export async function POST(request: NextRequest) {
     // Attach sectionOrder to data
     profile.sectionOrder = sectionOrder;
     profile.template = "Classic";
+    
     return NextResponse.json(profile, { status: 200 });
+
   } catch (error) {
     console.log("=== PDF EXTRACTION FAILED ===");
     console.log("Error details:", error);

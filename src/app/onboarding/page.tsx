@@ -9,6 +9,7 @@ import { Badge } from "../../components/ui/badge";
 import { Progress } from "../../components/ui/progress";
 import { ProfileSchema, ProfileType } from "../../lib/schemas/ProfileSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { uploadData, remove as removeStorage } from "aws-amplify/storage";
 import {
   User,
   Briefcase,
@@ -57,8 +58,14 @@ import { DragReorderHandler } from "@/components/dragToReorder";
 import { useRouter } from "next/navigation";
 import { updateUserAttributes } from "aws-amplify/auth";
 import { useProfileStore } from "@/store/profileStore";
+import { generateClient } from "aws-amplify/data";
+import { Schema } from "../../../amplify/data/resource";
 
+const client = generateClient<Schema>({
+  authMode: "apiKey",
 
+  apiKey: process.env.NEXT_GRAPH_QL_API_KEY,
+});
 
 const Onboarding = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -186,36 +193,66 @@ const Onboarding = () => {
   };
 
   const handleFileUpload = async (file: File) => {
+    // Validate first, before setting processing state
+    if (!file) {
+      toast.error("No file provided");
+      return;
+    }
+
+    if (file.type !== "application/pdf") {
+      toast.error("Please upload a PDF file");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File size must be less than 10MB");
+      return;
+    }
+    let id;
     setIsProcessing(true);
     try {
-      if (file) {
-        if (file.type !== "application/pdf") {
-          toast.error("Please upload a PDF file");
-          return;
-        }
-        if (file.size > 10 * 1024 * 1024) {
-          // 10MB limit
-          toast.error("File size must be less than 10MB");
-          return;
-        }
+      // Create job record
+      const { data, errors } = await client.models.FeedbackPolling.create(
+        {
+          status: "pending",
+        },
+        { authMode: "apiKey" }
+      );
+      id = data?.id;
+      if (errors || !data?.id) {
+        toast.error("Error creating job");
+        throw new Error("Error creating job");
       }
-      const formData = new FormData();
-      formData.append("file", file);
-      const response = await fetch("/api/extractPDF", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await response.json();
-      methods?.reset(data);
+
+      // Upload PDF
+      await uploadData({
+        data: file,
+        path: `pdf/${data.id}.pdf`,
+        options: {
+          contentType: "application/pdf",
+        },
+      }).result; // Wait for upload to complete
+
+      // Subscribe to updates
+      const response = await axios.get(`/api/extractPDF?id=${data.id}`);
+      
+      methods?.reset(response.data);
+      
+
     } catch (error) {
       console.error(error);
-      toast.error("Error extracting information from PDF");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Error extracting information from PDF"
+      );
     } finally {
-      setIsProcessing(false);
+      // Clean up subscription
+      removeStorage({path:`pdf/${id}.pdf`})
       setUploadMethod("manual");
       setCurrentStep(currentStep + 1);
+      setIsProcessing(false);
     }
-    // Mock PDF parsing - in real implementation, this would extract data from PDF
   };
   const sensors = useSensors(
     useSensor(PointerSensor, {
