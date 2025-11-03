@@ -5,19 +5,32 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import HeroSection from "./heroSection";
 import Features from "./features";
-import { ChevronRight, Zap } from "lucide-react";
-import excelify from '/public/excelify.png'
+import excelify from "../../../public/excelify.png";
+import {
+  ChevronRight,
+  Zap,
+} from "lucide-react";
 export function LandingPage() {
-  const onSignIn = () => {
-    router.push("/auth");
-  };
-  const router = useRouter();
+  const onSignIn =
+    () => {
+      router.push(
+        "/auth"
+      );
+    };
+  const router =
+    useRouter();
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Navigation */}
       <motion.nav
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
+        initial={{
+          y: -20,
+          opacity: 0,
+        }}
+        animate={{
+          y: 0,
+          opacity: 1,
+        }}
         className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,7 +38,9 @@ export function LandingPage() {
             <div className="flex items-center gap-3">
               <div className="relative w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center overflow-hidden">
                 <Image
-                  src={excelify}
+                  src={
+                    excelify
+                  }
                   alt="Excelify"
                   fill
                   priority
@@ -34,19 +49,31 @@ export function LandingPage() {
                 />
               </div>
               <div>
-                <h1 className="text-base lg:text-xl">ExcelifyAI</h1>
+                <h1 className="text-base lg:text-xl">
+                  ExcelifyAI
+                </h1>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <Button variant="ghost" onClick={onSignIn}>
-                Sign In
+              <Button
+                variant="ghost"
+                onClick={
+                  onSignIn
+                }
+              >
+                Sign
+                In
               </Button>
               <Button
-                onClick={onSignIn}
+                onClick={
+                  onSignIn
+                }
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
-                Get Early Access
+                Get
+                Early
+                Access
               </Button>
             </div>
           </div>
@@ -59,20 +86,73 @@ export function LandingPage() {
       <section className="py-20 px-6 mx-auto lg:px-12 bg-linear-to-b from-card/30 to-background">
         <div className="max-w-[1000px] mx-auto text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+            whileInView={{
+              opacity: 1,
+              y: 0,
+            }}
+            viewport={{
+              once: true,
+            }}
+            transition={{
+              duration: 0.6,
+            }}
           >
             <h2 className="text-3xl lg:text-5xl mb-6 tracking-tight">
-              Job hunting shouldn&apos;t feel like a full time job.
+              Job
+              hunting
+              shouldn&apos;t
+              feel
+              like
+              a
+              full
+              time
+              job.
             </h2>
             <p className="lext-lg lg:text-xl text-secondary leading-relaxed max-w-3xl mx-auto">
-              Between tailoring resumes, searching through hundreds of listings,
-              and preparing for interviews, landing your next role can be
-              overwhelming. ExcelifyAI streamlines every step with intelligent
-              AI assistance, so you can focus on what matters — putting your
-              best foot forward.
+              Between
+              tailoring
+              resumes,
+              searching
+              through
+              hundreds
+              of
+              listings,
+              and
+              preparing
+              for
+              interviews,
+              landing
+              your
+              next
+              role
+              can
+              be
+              overwhelming.
+              ExcelifyAI
+              streamlines
+              every
+              step
+              with
+              intelligent
+              AI
+              assistance,
+              so
+              you
+              can
+              focus
+              on
+              what
+              matters
+              —
+              putting
+              your
+              best
+              foot
+              forward.
             </p>
           </motion.div>
         </div>
@@ -84,32 +164,75 @@ export function LandingPage() {
 
         <div className="max-w-[900px] mx-auto text-center relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+            whileInView={{
+              opacity: 1,
+              y: 0,
+            }}
+            viewport={{
+              once: true,
+            }}
+            transition={{
+              duration: 0.6,
+            }}
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 mb-8">
               <Zap className="w-4 h-4 text-primary" />
               <span className="text-sm text-primary">
-                Limited Early Access Spots
+                Limited
+                Early
+                Access
+                Spots
               </span>
             </div>
 
             <h2 className="text-5xl lg:text-6xl mb-6 tracking-tight">
-              Be job-ready in days — not months.
+              Be
+              job-ready
+              in
+              days
+              —
+              not
+              months.
             </h2>
             <p className="text-xl text-secondary mb-10 leading-relaxed max-w-2xl mx-auto">
-              Join our waitlist today and get early access before launch. Be
-              among the first to experience the future of AI-powered job search.
+              Join
+              our
+              waitlist
+              today
+              and
+              get
+              early
+              access
+              before
+              launch.
+              Be
+              among
+              the
+              first
+              to
+              experience
+              the
+              future
+              of
+              AI-powered
+              job
+              search.
             </p>
 
             <Button
-              onClick={onSignIn}
+              onClick={
+                onSignIn
+              }
               size="lg"
               className="bg-primary text-background hover:bg-primary/90 rounded-full h-16 px-10 text-lg"
             >
-              Join the Waitlist
+              Join
+              the
+              Waitlist
               <ChevronRight className="w-5 h-5 ml-2" />
             </Button>
           </motion.div>
@@ -155,7 +278,12 @@ export function LandingPage() {
           </div>
 
           <div className="text-center mt-8 text-sm text-secondary">
-            © 2025 ExcelifyAI. All rights reserved.
+            ©
+            2025
+            ExcelifyAI.
+            All
+            rights
+            reserved.
           </div>
         </div>
       </footer>

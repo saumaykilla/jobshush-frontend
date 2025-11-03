@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
     const sectionOrder: ProfileType["sectionOrder"] = [
       { id: nanoid(), type: "PersonalDetails", value: "Personal Details" },
       { id: nanoid(), type: "RoleDetails", value: "Role Details" },
-      { id: nanoid(), type: "EducationDetails", value: "Education Details" },
+      { id: nanoid(), type: "EducationDetails", value: "Education" },
       { id: nanoid(), type: "WorkExperience", value: "Work Experience" },
       { id: nanoid(), type: "Skills", value: "Skills" },
     ];

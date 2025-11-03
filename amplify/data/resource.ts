@@ -1,121 +1,421 @@
-import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
+import {
+  type ClientSchema,
+  a,
+  defineData,
+} from "@aws-amplify/backend";
 
+const schema =
+  a.schema(
+    {
+      FeedbackPolling:
+        a
+          .model(
+            {
+              data: a.json(),
+              status:
+                a.string(),
+            }
+          )
+          .authorization(
+            (
+              allow
+            ) => [
+              allow.publicApiKey(),
+            ]
+          ),
+      PersonalDetails:
+        a.customType(
+          {
+            fullName:
+              a
+                .string()
+                .required(),
+            email:
+              a
+                .email()
+                .required(),
+            contactNumber:
+              a.string(),
+            country:
+              a.string(),
+            city: a.string(),
+          }
+        ),
+      links:
+        a.customType(
+          {
+            label:
+              a.string(),
+            url: a.string(),
+          }
+        ),
+      RoleDetails:
+        a.customType(
+          {
+            summary:
+              a.string(),
+            linkedInURL:
+              a.url(),
+            additionalLinks:
+              a
+                .ref(
+                  "links"
+                )
+                .array(),
+          }
+        ),
 
-const schema = a.schema({
+      EducationLineItems:
+        a.customType(
+          {
+            institute:
+              a
+                .string()
+                .required(),
+            degree:
+              a
+                .string()
+                .required(),
+            startDate:
+              a
+                .datetime()
+                .required(),
+            endDate:
+              a.datetime(),
+            location:
+              a
+                .string()
+                .required(),
+            description:
+              a.string(),
+          }
+        ),
 
-  FeedbackPolling : a.model({
-    data:a.json(),
-    status:a.string(),
-  }).authorization((allow) => [allow.publicApiKey()]),
-  PersonalDetails: a.customType({
-    fullName: a.string().required(),
-    email: a.email().required(),
-    contactNumber: a.string(),
-    country: a.string(),
-    city: a.string(),
-  }),
-  links: a.customType({
-    label: a.string(),
-    url: a.string(),
-  }),
-  RoleDetails: a.customType({
-    summary: a.string(),
-    linkedInURL: a.url(),
-    additionalLinks: a.ref('links').array(),
-  }),
+      WorkExperienceLineItems:
+        a.customType(
+          {
+            company:
+              a
+                .string()
+                .required(),
+            role: a
+              .string()
+              .required(),
+            startDate:
+              a
+                .datetime()
+                .required(),
+            endDate:
+              a.datetime(),
+            location:
+              a
+                .string()
+                .required(),
+            description:
+              a.string(),
+          }
+        ),
 
-  EducationLineItems: a.customType({
-    institute: a.string().required(),
-    degree: a.string().required(),
-    startDate: a.datetime().required(),
-    endDate: a.datetime(),
-    location: a.string().required(),
-    description: a.string(),
-  }),
+      CustomSectionLineItems:
+        a.customType(
+          {
+            header:
+              a
+                .string()
+                .required(),
+            subHeader:
+              a.string(),
+            description:
+              a.string(),
+          }
+        ),
 
-  WorkExperienceLineItems: a.customType({
-    company: a.string().required(),
-    role: a.string().required(),
-    startDate: a.datetime().required(),
-    endDate: a.datetime(),
-    location: a.string().required(),
-    description: a.string(),
-  }),
+      Education:
+        a.customType(
+          {
+            fieldName:
+              a
+                .string()
+                .required(),
+            lineItem:
+              a
+                .ref(
+                  "EducationLineItems"
+                )
+                .array()
+                .required(),
+          }
+        ),
 
-  CustomSectionLineItems: a.customType({
-    header: a.string().required(),
-    subHeader: a.string(),
-    description: a.string(),
-  }),
+      WorkExperience:
+        a.customType(
+          {
+            fieldName:
+              a
+                .string()
+                .required(),
+            lineItem:
+              a
+                .ref(
+                  "WorkExperienceLineItems"
+                )
+                .array(),
+          }
+        ),
 
-  Education: a.customType({
-    fieldName: a.string().required(),
-    lineItem: a.ref("EducationLineItems").array().required(),
-  }),
+      CustomSections:
+        a.customType(
+          {
+            sectionID:
+              a
+                .string()
+                .required(),
+            sectionName:
+              a
+                .string()
+                .required(),
+            lineItems:
+              a
+                .ref(
+                  "CustomSectionLineItems"
+                )
+                .array(),
+          }
+        ),
+      SectionOrderType:
+        a.customType(
+          {
+            id: a
+              .string()
+              .required(),
+            type: a
+              .string()
+              .required(),
+            value:
+              a
+                .string()
+                .required(),
+          }
+        ),
+      Resume:
+        a.customType(
+          {
+            personalDetails:
+              a
+                .ref(
+                  "PersonalDetails"
+                )
+                .required(),
+            roleDetails:
+              a
+                .ref(
+                  "RoleDetails"
+                )
+                .required(),
+            education:
+              a
+                .ref(
+                  "Education"
+                )
+                .required(),
+            workExperience:
+              a.ref(
+                "WorkExperience"
+              ),
+            skills:
+              a.customType(
+                {
+                  fieldName:
+                    a.string(),
+                  data: a.string(),
+                }
+              ),
+            sectionOrder:
+              a
+                .ref(
+                  "SectionOrderType"
+                )
+                .array()
+                .required(),
+            customSections:
+              a
+                .ref(
+                  "CustomSections"
+                )
+                .array(),
+            template:
+              a.enum(
+                [
+                  "Classic",
+                  "Modern",
+                ]
+              ),
+          }
+        ),
 
-  WorkExperience: a.customType({
-    fieldName: a.string().required(),
-    lineItem: a.ref("WorkExperienceLineItems").array(),
-  }),
+      Profile:
+        a
+          .model(
+            {
+              resume:
+                a
+                  .ref(
+                    "Resume"
+                  )
+                  .required(),
+              optimizationLimit:
+                a
+                  .integer()
+                  .required(),
+              resetTime:
+                a
+                  .datetime()
+                  .required(),
+            }
+          )
+          .authorization(
+            (
+              allow
+            ) => [
+              allow.owner(),
+            ]
+          ),
 
-  CustomSections: a.customType({
-    sectionID: a.string().required(),
-    sectionName: a.string().required(),
-    lineItems: a.ref("CustomSectionLineItems").array(),
-  }),
-  SectionOrderType: a.customType({
-    id: a.string().required(),
-    type: a.string().required(),
-    value: a.string().required()
-  }),
-  Resume: a.customType({
-    personalDetails: a.ref("PersonalDetails").required(),
-    roleDetails: a.ref("RoleDetails").required(),
-    education: a.ref("Education").required(),
-    workExperience: a.ref("WorkExperience"),
-    skills: a.customType({ fieldName: a.string(), data: a.string() }),
-    sectionOrder: a.ref("SectionOrderType").array().required(),
-    customSections: a.ref("CustomSections").array(),
-    template: a.enum(
-      [
-        "Classic",
-        "Modern",
-      ]
-    ),
-  }),
+      InterviewFeedback:
+        a.customType(
+          {
+            improvement:
+              a
+                .string()
+                .array(),
+            strengths:
+              a
+                .string()
+                .array(),
+            starAnalysis:
+              a
+                .string()
+                .array(),
+            overallScore:
+              a.integer(),
+            confidenceScore:
+              a.integer(),
+            duration:
+              a.integer(),
+          }
+        ),
+      MockInterviewFeedback:
+        a
+          .model(
+            {
+              userId:
+                a
+                  .string()
+                  .required(),
+              recording:
+                a.string(),
+              companyName:
+                a.string(),
+              status:
+                a.enum(
+                  [
+                    "pending",
+                    "completed",
+                    "failed",
+                  ]
+                ),
+              reasonForFailure:
+                a.string(),
+              feedback:
+                a.ref(
+                  "InterviewFeedback"
+                ),
+            }
+          )
+          .authorization(
+            (
+              allow
+            ) => [
+              allow
+                .authenticated()
+                .to(
+                  [
+                    "create",
+                    "update",
+                    "delete",
+                    "get",
+                    "list",
+                    "sync",
+                    "search",
+                    "listen",
+                  ]
+                ),
+              allow
+                .publicApiKey()
+                .to(
+                  [
+                    "create",
+                    "update",
+                    "delete",
+                    "get",
+                    "list",
+                    "sync",
+                    "search",
+                    "listen",
+                  ]
+                ),
+            ]
+          ),
 
-  Profile: a.model({
-    resume: a.ref("Resume").required(),
-    optimizationLimit: a.integer().required(),
-    resetTime: a.datetime().required(),
-  }).authorization((allow) => [allow.owner()]),
-
-  MockInterviewFeedback: a.model({
-    userId: a.string().required(),
-    recording:a.string(),
-    companyName:a.string().required(),
-    status:a.enum(['pending','completed','failed']),
-    feedback : a.customType({
-      imporvement:a.string().array(),
-      strengths:a.string().array(),
-      starAnalysis:a.string().array(),
-      overallScore:a.integer(),
-      confidenceScore:a.integer(),
-      duration:a.integer(),
-    })
-  }).authorization((allow) => [allow.owner()]),
-
-  Application: a.model({
-    status:a.enum(['Applied','Interview','Rejected']),
-    jobDescription: a.string().required(),
-    resumeName: a.string().required(),
-    resume: a.ref("Resume").required(),
-    oldMetric: a.integer().required(),
-    newMetric: a.integer().required(),
-    coverLetter: a.string().required(),
-  }).authorization((allow) => [allow.owner()]),
-});
-
+      Application:
+        a
+          .model(
+            {
+              status:
+                a.enum(
+                  [
+                    "Applied",
+                    "Interview",
+                    "Rejected",
+                  ]
+                ),
+              jobDescription:
+                a
+                  .string()
+                  .required(),
+              resumeName:
+                a
+                  .string()
+                  .required(),
+              resume:
+                a
+                  .ref(
+                    "Resume"
+                  )
+                  .required(),
+              oldMetric:
+                a
+                  .integer()
+                  .required(),
+              newMetric:
+                a
+                  .integer()
+                  .required(),
+              coverLetter:
+                a
+                  .string()
+                  .required(),
+            }
+          )
+          .authorization(
+            (
+              allow
+            ) => [
+              allow.owner(),
+            ]
+          ),
+    }
+  );
 
 export type Schema =
   ClientSchema<
@@ -127,13 +427,15 @@ export const data =
     {
       schema,
       authorizationModes:
-      {
-        defaultAuthorizationMode:
-          "userPool",
-          apiKeyAuthorizationMode:{
-            description:"API Key Authorization",
-            expiresInDays:365
-          }
-      },
+        {
+          defaultAuthorizationMode:
+            "userPool",
+          apiKeyAuthorizationMode:
+            {
+              description:
+                "API Key Authorization",
+              expiresInDays: 365,
+            },
+        },
     }
   );
